@@ -1,0 +1,61 @@
+doctype html
+html
+    head
+        title= title
+        link(rel='stylesheet', href='/stylesheets/style.css')
+
+        <!-- Latest compiled and minified CSS -->
+        link(rel="stylesheet" href="/stylesheets/bootstrap.min.css")
+
+        <!-- jQuery library -->
+        script(src="javascripts/jquery-3.3.1.min.js")
+
+        <!-- Latest compiled JavaScript -->
+        script(src="javascripts/bootstrap.min.js")
+
+        <!-- This page script -->
+        script(src="javascripts/admin.js")
+
+    body
+        block content
+
+            h1= title
+            p Welcome to #{title}
+
+            div(style="display: block") Иcкать по id
+                input(type="checkbox" id="idSearch")
+
+            div(class="input-group")
+                input(class="form-control" type="text" id="search" onkeyup="search()" placeholder="Поиск..")
+                span(class="input-group-addon") 🔎
+
+
+            table(class = "table")
+                thead
+                    tr
+                        each i in dataIndexes
+                            th(scope = col) #{i}
+                        th
+                        th
+                tbody
+                    each d in data
+                        tr
+                            each i in dataIndexes
+                                td
+                                    if( i == "_id")
+                                        div(col = i) #{d[i]}
+                                    else
+                                        div(col = i, contenteditable) #{d[i]}
+                            td
+                                button(class="btn btn-primary") Save
+                            td
+                                button(class="btn btn-danger") Delete
+
+
+
+
+
+
+
+
+

@@ -12,4 +12,6 @@ router.get('/', function(req, res, next) {
   socket.sendMessage(req.query.q);
 });
 
+
+
 module.exports = router;
