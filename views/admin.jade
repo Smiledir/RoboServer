@@ -22,13 +22,23 @@ html
             h1= title
             p Welcome to #{title}
 
+            div(id="addGroup")
+                each i in dataIndexes
+                    if(i != "_id")
+                        div(class="input-group")
+                            span(class="input-group-addon") #{i}
+                            input(class="form-control" type="text" placeholder=i)
+            br
+            button(id="addButton" class="btn btn-primary") Add
+
+            br
+            br
             div(style="display: block") Иcкать по id
                 input(type="checkbox" id="idSearch")
 
             div(class="input-group")
                 input(class="form-control" type="text" id="search" onkeyup="search()" placeholder="Поиск..")
                 span(class="input-group-addon") 🔎
-
 
             table(class = "table")
                 thead

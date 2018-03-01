@@ -2,7 +2,6 @@
 var search = function() {
 
     var input = document.getElementById("search").value.toUpperCase();
-    console.log(input);
     var allTD = $("table tr td");
     var isSarchId = $("#idSearch").is(':checked');
     allTD.each(function () {
@@ -21,25 +20,60 @@ $(document).ready(function(){
         search();
     });
 
-    $("table tbody tr td .btn-primary").click(function(){
+    $("#addButton").click(function(){
         var data = {};
-        console.log("aaza");
-        $(this).parent().parent().children().each(function () {
-            console.log($(this).find("div").attr("col") + " : " + $(this).find("div").text())
-            var key = $(this).find("div").attr("col");
-            var val = $(this).find("div").text();
-            if (key != undefined) data[key] = val;
+
+        $("#addGroup").children().each(function () {
+            var key = $(this).find("span").text();
+            var val = $(this).find("input").val();
+            data[key] = val;
         });
 
-        console.log(data);
-
-        $.post("admin/update", data)
-            .done(function () {
-                console.log("save success");
+        $.post("admin", data)
+            .done(function (res) {
+                var indexes;
+                for(var i = indexes.length -1; i >= 0; i--){
+                    indexes[i]
+                }
+                $("table thead tr th").each(function () {
+                    //indexes[]
+                });
+                var tr = ($("<tr></tr>"));
+                $.each(res, function(index, value){
+                    var td = ($("<td></td>"));
+                    var div = ($("<div></div>"));
+                    div.attr("col", index);
+                    div.val(value);
+                    td.append(div)
+                    tr.append(td);
+                });
+                $("table").append(tr);
             })
             .fail(function () {
                 console.log("error");
             });
+    });
+
+    $("table tbody tr td .btn-primary").click(function(){
+        var data = {};
+
+        $(this).parent().parent().children().each(function () {
+            var key = $(this).find("div").attr("col");
+            var val = $(this).find("div").text();
+            if (key !== undefined) data[key] = val;
+        });
+
+        $.ajax({
+            url: 'admin',
+            type: 'PUT',
+            data:  data,
+            success: function() {
+                console.log("save success");
+            },
+            error: function() {
+                console.log("error");
+            }
+        });
     });
 
     $("table tbody tr td .btn-danger").click(function(){
@@ -48,17 +82,21 @@ $(document).ready(function(){
 
             var key = $(this).find("div").attr("col");
 
-            if(key == "_id"){
+            if(key === "_id"){
                 var val = $(this).find("div").text();
 
-                $.post("admin/delete", {_id : val})
-                    .done(function () {
+                $.ajax({
+                    url: 'admin',
+                    type: 'DELETE',
+                    data:  {_id : val},
+                    success: function() {
                         row.fadeOut();
                         console.log("save success");
-                    })
-                    .fail(function () {
+                    },
+                    error: function() {
                         console.log("error");
-                    });
+                    }
+                });
             }
         });
     });
