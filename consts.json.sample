@@ -1,0 +1,12 @@
+{
+  "googleOAuth": {
+    "client_id": "",
+    "project_id": "",
+    "callback_url": "",
+    "client_secret": ""
+  },
+  "database": {
+    "url": "",
+    "name": ""
+  }
+}

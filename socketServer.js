@@ -1,6 +1,28 @@
-var express = require('express');
-var net = require('net');
+var dataController = require('./dataController');
+var server = require('http').createServer();
+var io = require('socket.io')(server);
+io.on('connection', function(client){
+    console.log("startConnection");
 
+    client.on('firstData', function(data){
+        console.log("firstData");
+        console.log(data);
+        firstDataSocket(data, client)
+    });
+
+    client.on('data', function(data){
+        console.log("data");
+        console.log(data);
+        dataSocket(data, client);
+    });
+
+    client.on('disconnect', function(data){
+        console.log("disconnect");
+        closeSocket(data, client)
+    });
+});
+console.log("startSocketServer");
+server.listen(6000);
 // Счетчик подключений
 var a = 0;
 
@@ -14,41 +36,24 @@ var trucksAddressToInfo = [];
 var trucksAddressToSocket = [];
 // Словарь key - имя value - address
 var trucksNameToAddress = [];
+// имена тележек из бызы
+var trucksNames = [];
 
 // Пример джейсончика, который должен прийти от клиента при соединении
 // {"pass":123, "name":"kuk"}
 
-var server = net.createServer(function(socket) {
-    console.log(a++);
+// Читаем тележки из базы
+// Связываем их с сокетами по имени
+var readTracksFromBase = function(){
 
-    // Ловим ивент о принятии сообщений
-    socket.on('data', function(buffer){
-        dataSocket(buffer, socket)
-    });
+}
 
-    // Ловим ивент о закрытии соединения
-    socket.on('close', function(buffer){
-        closeSocket(buffer, socket)
-    });
-
-    // Отправляем сообщение о соединении
-    // Не несет за собой никакой информации,
-    // просто наглядный способ узнать, что сообщение установленно
-    socket.write("connect\n\r");
-});
-
-var dataSocket = function(buffer, socket){
+var firstDataSocket = function(buffer, socket){
     console.log(buffer.toString());
 
-    // Превращаем буффер в строку, потом парсим из него джейсон
-    // Трай - катч не самый лучший способ для валидации джейсона, но пока и так сойдет
-    // TODO В будущем лучше заменить на регулярку
-    try {
-        var json = JSON.parse(buffer.toString());
-    }catch (e){
-        console.log("Wrong JSON");
-        return;
-    }
+    dataController.registerTruck(buffer, socket);
+
+    var json = buffer;
 
     // Служебный лог
     console.log(json.pass, json.name, socket.localAddress);
@@ -73,6 +78,12 @@ var dataSocket = function(buffer, socket){
         socket.end("Name Already Used\n");
         console.log("Name Already Used " + json.name);
         return;
+    }
+
+    if(!trucksNames.has(json.name)){
+        socket.end("Truck no on base\n");
+        console.log("Truck no on base " + json.name);
+        rturn;
     }
 
     // Структура информации, пока включает в себя:
@@ -105,11 +116,19 @@ var closeSocket = function(buffer, socket){
 var sendMessage = function(message, name) {
     console.log(message + " | " + name);
    // socket.write( message + ' Echo server\r\n');
-}
+};
+
+// Функция отправки нодов тележке
+var sendNodes = function(nodes, truck) {
+    console.log(nodes);
+
+    truck.emit("nodes", JSON.stringify(answer));
+};
 
 // Добавляем маршрут (передаем в другой скрипт) функцию отправки ообщений
 module.exports = {
-    sendMessage: sendMessage
+    sendMessage: sendMessage,
+    sendNodes:sendNodes
 };
 
 

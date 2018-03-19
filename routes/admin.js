@@ -1,15 +1,22 @@
 const MongoClient    = require('mongodb').MongoClient;
 const ObjectID       = require('mongodb').ObjectID;
+const consts         = require("../consts.json");
 
-const url            = "mongodb://admin:GyJ67Pzz@ds141028.mlab.com:41028/robotsdb";
-const dbName         = "robotsdb";
+
+const url            = consts.database.url;
+const dbName         = consts.database.name;
 const dbCollection   = "notes";
 
 var express = require('express');
 var router = express.Router();
 
+var passport = require('passport');
+
 /* GET users listing. */
 router.get('/', function(req, res, next) {
+    console.log(req.session.clientEmail );
+    console.log(req.session.isAdmin);
+    console.log(req.session.token);
     MongoClient.connect(url, function(err, db) {
         if (err) throw err;
         var dbo = db.db(dbName);

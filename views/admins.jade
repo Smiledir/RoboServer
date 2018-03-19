@@ -1,0 +1,46 @@
+doctype html
+html
+    head
+        title= title
+        <!-- Latest compiled and minified CSS -->
+        link(rel="stylesheet" href="/stylesheets/bootstrap.min.css")
+
+        <!-- Latest compiled and special CSS -->
+        link(rel="stylesheet" href="/stylesheets/admins/util.css")
+        link(rel="stylesheet" href="/stylesheets/admins/main.css")
+
+
+    body
+        block content
+            div(class="limiter")
+                div(class="container-login100" style="background-image: url('images/admins/bg-01.jpg');")
+                    div(class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33")
+
+                        if(login === true)
+
+                            span(class="login100-form-title p-b-53") Choose Table
+
+                            a(href="#" class="btn-google m-b-20")
+                                p(class="h4") Admin Users
+
+                            a(href="#" class="btn-google m-b-20")
+                                p(class="h4") Collections
+
+                            br
+                            a(href="admins/logout" class="btn-google m-b-20")
+                                p(class="h4") Logout
+
+                        else
+                            span(class="login100-form-title p-b-53") Sign In With
+
+                            a(href="admins/auth/google" class="btn-google m-b-20")
+                                img(src="images/admins/icons/icon-google.png" alt="GOOGLE")
+                                p(class="h4") Google
+
+
+
+
+
+
+
+

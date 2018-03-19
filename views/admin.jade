@@ -24,7 +24,7 @@ html
 
             div(id="addGroup")
                 each i in dataIndexes
-                    if(i != "_id")
+                    if(i !== "_id")
                         div(class="input-group")
                             span(class="input-group-addon") #{i}
                             input(class="form-control" type="text" placeholder=i)
@@ -52,7 +52,7 @@ html
                         tr
                             each i in dataIndexes
                                 td
-                                    if( i == "_id")
+                                    if( i === "_id")
                                         div(col = i) #{d[i]}
                                     else
                                         div(col = i, contenteditable) #{d[i]}
