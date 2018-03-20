@@ -16,19 +16,50 @@ html
                 div(class="container-login100" style="background-image: url('images/admins/bg-01.jpg');")
                     div(class="wrap-login100 p-l-110 p-r-110 p-t-62 p-b-33")
 
-                        if(login === true)
+                        if(login)
 
-                            span(class="login100-form-title p-b-53") Choose Table
+                            if(isAdmin)
 
-                            a(href="#" class="btn-google m-b-20")
-                                p(class="h4") Admin Users
+                                span(class="login100-form-title p-b-53") Выберите табличку
 
-                            a(href="#" class="btn-google m-b-20")
-                                p(class="h4") Collections
+                                div(class="row")
+                                    a(href="area" class="btn-google m-b-20 ")
+                                        p(class="h4") Areas
 
-                            br
-                            a(href="admins/logout" class="btn-google m-b-20")
-                                p(class="h4") Logout
+                                    a(href="node" class="btn-google m-b-20 ")
+                                        p(class="h4") Nodes
+
+                                div(class="row")
+                                    a(href="node2node" class="btn-google m-b-20")
+                                        p(class="h4") Node2Node
+
+                                    a(href="person" class="btn-google m-b-20")
+                                        p(class="h4") Persons
+
+                                div(class="row")
+                                    a(href="robot" class="btn-google m-b-20")
+                                        p(class="h4") Robots
+
+                                    a(href="room" class="btn-google m-b-20")
+                                        p(class="h4") Rooms
+                                div(class="row")
+                                    a(href="users" class="btn-google m-b-20")
+                                        p(class="h4") Users
+
+                                br
+                                br
+                                a(href="admins/logout" class="btn-google m-b-20")
+                                    p(class="h4") Logout
+
+                            else
+
+                                span(class="login100-form-title p-b-53") У вас нехватает прав
+
+                                br
+                                br
+                                a(href="admins/logout" class="btn-google m-b-20")
+                                    p(class="h4") Logout
+
 
                         else
                             span(class="login100-form-title p-b-53") Sign In With

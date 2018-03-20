@@ -6,9 +6,17 @@ var logger = require('morgan');
 var bodyParser = require('body-parser');
 
 var index = require('./routes/index');
-var users = require('./routes/users');
 var admins = require('./routes/admins');
-var admin = require('./routes/admin');
+
+// Таблицы
+var area = require('./routes/tables/area');
+var node = require('./routes/tables/node');
+var node2Node = require('./routes/tables/node2node');
+var person = require('./routes/tables/person');
+var robot = require('./routes/tables/robot');
+var room = require('./routes/tables/room');
+var users = require('./routes/tables/users');
+var admin = require('./routes/tables/admin');
 
 var app = express();
 
@@ -38,16 +46,24 @@ app.use(cookieSession({
     name: 'session',
     keys: [consts.session.key],
     // Cookie Options
-    //maxAge: 24 * 60 * 60 * 1000 // 24 hours
-    maxAge: 100000 // 24 hours
+    maxAge: 24 * 60 * 60 * 1000 // 24 hours
 }));
 
 app.use(passport.initialize());
 app.use(passport.session());
 
 app.use('/', index);
-app.use('/users', users);
 app.use('/admins', admins);
+
+
+// Таблицы
+app.use('/area', area);
+app.use('/node', node);
+app.use('/node2Node', node2Node);
+app.use('/person', person);
+app.use('/robot', robot);
+app.use('/room', room);
+app.use('/users', users);
 app.use('/admin', admin);
 
 // catch 404 and forward to error handler

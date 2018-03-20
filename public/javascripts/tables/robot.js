@@ -1,9 +1,12 @@
 
+const pageName = "robot";
+
+
 var search = function() {
 
-    var input = document.getElementById("search").value.toUpperCase();
-    var allTD = $("table tr td");
-    var isSarchId = $("#idSearch").is(':checked');
+    let input = document.getElementById("search").value.toUpperCase();
+    let allTD = $("table tr td");
+    let isSarchId = $("#idSearch").is(':checked');
     allTD.each(function () {
         $(this).parent().attr("style", "display : none");
     });
@@ -14,34 +17,29 @@ var search = function() {
             $(this).parent().attr("style", "display : ");
         }
     });
-}
+};
+
 $(document).ready(function(){
     $("#idSearch").click(function(){
         search();
     });
 
     $("#addButton").click(function(){
-        var data = {};
+        let data = {};
 
         $("#addGroup").children().each(function () {
-            var key = $(this).find("span").text();
-            var val = $(this).find("input").val();
+            let key = $(this).find("span").text();
+            let val = $(this).find("input").val();
             data[key] = val;
         });
 
-        $.post("admin", data)
+        $.post(pageName, data)
             .done(function (res) {
-                var indexes;
-                for(var i = indexes.length -1; i >= 0; i--){
-                    indexes[i]
-                }
-                $("table thead tr th").each(function () {
-                    //indexes[]
-                });
-                var tr = ($("<tr></tr>"));
+
+                let tr = ($("<tr></tr>"));
                 $.each(res, function(index, value){
-                    var td = ($("<td></td>"));
-                    var div = ($("<div></div>"));
+                    let td = ($("<td></td>"));
+                    let div = ($("<div></div>"));
                     div.attr("col", index);
                     div.val(value);
                     td.append(div)
@@ -55,16 +53,16 @@ $(document).ready(function(){
     });
 
     $("table tbody tr td .btn-primary").click(function(){
-        var data = {};
+        let data = {};
 
         $(this).parent().parent().children().each(function () {
-            var key = $(this).find("div").attr("col");
-            var val = $(this).find("div").text();
+            let key = $(this).find("div").attr("col");
+            let val = $(this).find("div").text();
             if (key !== undefined) data[key] = val;
         });
 
         $.ajax({
-            url: 'admin',
+            url: pageName,
             type: 'PUT',
             data:  data,
             success: function() {
@@ -77,16 +75,16 @@ $(document).ready(function(){
     });
 
     $("table tbody tr td .btn-danger").click(function(){
-        var row = $(this).parent().parent();
+        let row = $(this).parent().parent();
         row.children().each(function () {
 
-            var key = $(this).find("div").attr("col");
+            let key = $(this).find("div").attr("col");
 
             if(key === "_id"){
-                var val = $(this).find("div").text();
+                let val = $(this).find("div").text();
 
                 $.ajax({
-                    url: 'admin',
+                    url: pageName,
                     type: 'DELETE',
                     data:  {_id : val},
                     success: function() {
