@@ -24,9 +24,10 @@ var passport = require('passport');
 var auth = require('./auth');
 var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
-//var socketFromDevice = require('./socketFromDevice');
+var socketFromDevice = require('./socketFromDevice');
+var socketServer = require('./socketServer');
 //var routeBuilder = require('./routeBuilder');
-//var dataController = require('./dataController');
+var dataController = require('./dataController');
 
 auth(passport);
 

@@ -8,13 +8,13 @@ const dbName         = consts.database.name;
 const dbTrucks       = "Robot";
 
 var routeBuilder = require('./routeBuilder');
-var socketServer = require('./socketServer');
 
 // Надо подумать о первом подключении и вс с этим свзанное
 var trucksToDevices = new Map();
 var devicesToTrucks = new Map();
 
 // Используем сет, чтобы значение не дублировалось
+// а лучше на какой нибудь
 var trucks = new Set();
 
 /*MongoClient.connect(url, function(err, db) {
@@ -46,22 +46,38 @@ var takeDeviceData = function(coords, device) {
     // Получаем ближайшую свободную тележку
     let truck = findNearestFreeTruck(nodes[0]);
 
+   // console.log(truck.name);
+
     // Нужно не забыть проверку на то, что тележек свободных сейчаc нет
     // Обработать этот случай отдельно
 
-    // связываем тележку и устройство
-    trucksToDevices.set(device, truck);
-    devicesToTrucks.set(truck, device);
+    if(truck === undefined || truck.isBusy){
+        console.log("cancel, no trucks");
+        device.emit("cancel", "{\"error\": \"Нет свободных тележек, попробуйте позже\"}");
+        return;
+    }
 
-    socketServer.sendNodes(nodes, truck);
+    truck.isBusy = true;
+
+    // связываем тележку и устройство
+    trucksToDevices.set(truck.socket, device);
+    devicesToTrucks.set(device, truck);
+
+    sendNodes(nodes, truck, device);
+};
+
+// Функция отправки нодов тележке
+var sendNodes = function(nodes, truck, device) {
+    console.log(JSON.stringify(nodes));
+
+    truck.socket.emit("nodes", JSON.stringify(nodes));
+    device.emit("data", "{\"trackName\": \"" + truck.name + "\"}");
 };
 
 var findNearestFreeTruck = function(node) {
 
     //Поиск на незанятость
-    set.forEach((truck, valueAgain, set) => {
-        if(!truck.isBusy) return truck;
-    });
+    for (let item of trucks) if(!item.isBusy) return item;
 
     // Нужен поиск по координатам
 
@@ -84,25 +100,95 @@ var registerTruck = function(data, truckSocket) {
         dbo.collection(dbTrucks).find(query).toArray(function(err, result) {
             if (err) throw err;
 
-            for (let key in result[0]) {
-                dataIndexes.push(key);
-            }
-
             let truck = {
+                name: data.name,
                 socket: truckSocket,
                 isBusy: false
             };
 
+            console.log("truck add");
+
+            // Проверка на добавленность
+            for (let item of trucks) if(item.name === data.name) {
+                truckSocket.emit("firstData", " \"{\"error\": \"Name Already Used\"}");
+                db.close();
+                return;
+            }
+
+            trucks.add(truck);
+
             db.close();
         });
     });
+};
 
+var startWay = function(data, device) {
+    let truck = devicesToTrucks.get(device);
 
-    trucks.add(truck)
+    if(truck === undefined){
+        console.log("wrong truck");
+        device.emit('cancel', "{\"error\": \"startWay wrong truck\"}")
+        return;
+    }
+
+    // Тут можно передавать девайс id
+    // Но пока несущественно, так как есть словари
+    truck.socket.emit("starWay", "{\"status\" : \"OK\"}");
+};
+
+var wayEnd = function(data, truck) {
+    let device = trucksToDevices.get(truck);
+
+    if(device === undefined){
+        console.log("wrong device");
+        truck.emit('cancel', "{\"error\": \"wayEnd wrong device\"}")
+        return;
+    }
+
+    devicesToTrucks.delete(device);
+    trucksToDevices.delete(truck);
+
+    // Тут можно передавать девайс id
+    // Но пока несущественно, так как есть словари
+    device.emit("wayEnd", "{\"status\" : \"OK\"}");
+};
+
+var onPlace = function(data, truck) {
+    let device = trucksToDevices.get(truck);
+
+    if(device === undefined){
+        console.log("wrong device");
+        truck.emit('cancel', "{\"error\": \"onPlace wrong device\"}")
+        return;
+    }
+
+    // Тут можно передавать девайс id
+    // Но пока несущественно, так как есть словари
+    device.emit("onPlace", "{\"status\" : \"OK\"}");
+};
+
+var cancelDevice = function(data, device) {
+    let truck = devicesToTrucks.get(device);
+
+    if(truck === undefined){
+        console.log("wrong truck");
+        return;
+    }
+
+    devicesToTrucks.delete(device);
+    trucksToDevices.delete(truck);
+
+    // Тут можно передавать девайс id
+    // Но пока несущественно, так как есть словари
+    truck.socket.emit("cancel", "{\"status\" : \"OK\"}");
 };
 
 
 module.exports = {
     takeDeviceData: takeDeviceData,
-    registerTruck: registerTruck
+    registerTruck: registerTruck,
+    startWay: startWay,
+    wayEnd: wayEnd,
+    onPlace: onPlace,
+    cancelDevice: cancelDevice
 };

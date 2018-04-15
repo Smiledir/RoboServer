@@ -32,7 +32,7 @@ router.get('/', function(req, res, next) {
             for (let key in result[0]) {
                 dataIndexes.push(key);
             }
-            res.render(pageName, { title: 'Admins', data: result, dataIndexes: dataIndexes });
+            res.render(pageName, { title: 'Robot', data: result, dataIndexes: dataIndexes });
             db.close();
         });
     });

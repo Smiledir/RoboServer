@@ -8,7 +8,6 @@ const dbName         = consts.database.name;
 const dbCollection   = "Node2Node";
 
 var nodes = [];
-
 // Функция для параноиков, позволяет обновить кэш из базы
 var refreshNodes = function() {
 
@@ -30,20 +29,7 @@ var buildRoute = function(coords) {
 
     if(coords == undefined || coords.x == undefined || coords.y == undefined ){
         console.log("Wrong Coords")
-        return "Error";
-    }
-
-    // Тут по координатам ищем путь
-    // НЕ ЗАБУДЬ вершины уже закешированны
-    // Возвращаем вершины
-    return nodes;
-};
-
-var buildRoute = function(coords) {
-
-    if(coords == undefined || coords.x == undefined || coords.y == undefined ){
-        console.log("Wrong Coords")
-        return "Error";
+        //return "Error";
     }
 
     // Тут по координатам ищем путь
