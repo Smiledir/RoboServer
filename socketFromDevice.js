@@ -28,6 +28,8 @@ io.on('connection', function(client){
 
     client.on('disconnect', function(){
         console.log("disconnect");
+        let data = "{}";
+        cancel(data, client);
     });
 });
 console.log("startSocketServerFromDevice");

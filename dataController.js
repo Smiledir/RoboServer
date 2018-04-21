@@ -115,6 +115,7 @@ var registerTruck = function(data, truckSocket) {
                 return;
             }
 
+            truckSocket.emit("firstData", " \"{\"status\": \"OK\"}");
             trucks.add(truck);
 
             db.close();
@@ -175,6 +176,7 @@ var cancelDevice = function(data, device) {
         return;
     }
 
+    truck.isBusy = false;
     devicesToTrucks.delete(device);
     trucksToDevices.delete(truck);
 

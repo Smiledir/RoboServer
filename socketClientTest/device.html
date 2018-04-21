@@ -1,0 +1,72 @@
+<script src="socket.io.js"></script>
+<script>
+  var socketDevice = io('http://localhost:4000');
+  socketDevice.on('connect', function(){});
+  socketDevice.on('firstData', function(data){console.log(data);});
+  socketDevice.on('cancel', function(data){console.log("cancel"); console.log(data);});
+  socketDevice.on('onPlace', function(data){console.log("onPlace"); console.log(data);});  
+  socketDevice.on('wayEnd', function(data){console.log("wayEnd"); console.log(data);});  
+  socketDevice.on('disconnect', function(){});
+
+//  socket.emit('firstData', "{\"name\": \"piRobot\",\"pass\": \"123\"}");
+
+  function socketDeviceSendFirstData(){
+		console.log("send");
+		var json = JSON.parse("{\"deviceId\": \"sdfsdfsdfsdfsdf\" }")
+		socketDevice.emit('firstData', json);
+  }		
+
+  function socketDeviceSendData(){
+		console.log("send");
+		var json = JSON.parse("{\"deviceId\": \"sdfsdfsdfsdfsdf\", \"searchText\": \"azazaz\" }")
+		socketDevice.emit('data', json);
+  }		
+
+  function socketDeviceStartWay(){
+		console.log("send");
+		var json = JSON.parse("{\"deviceId\": \"sdfsdfsdfsdfsdf\" }")
+		socketDevice.emit('startWay', json);
+  }	
+
+
+  var socketTruck = io('http://localhost:5000');
+  socketTruck.on('connect', function(){});
+  socketTruck.on('firstData', function(data){console.log("firstData"); console.log(data);});  
+  socketTruck.on('nodes', function(data){console.log("nodes"); console.log(data);});
+  socketTruck.on('startWay', function(data){console.log("startWay"); console.log(data);});  
+  socketTruck.on('cancel', function(data){console.log("cancel"); console.log(data);});
+  socketTruck.on('disconnect', function(){});
+
+  
+
+  function socketTruckSendFirstData(){
+		console.log("sendFD");
+		socketTruck.emit('firstData', "{\"name\": \"piRobot\",\"pass\": \"123\"}");
+  }	
+
+  function socketTruckSendWayEnd(){
+		console.log("sendWayEnd");
+		socketTruck.emit('wayEnd', "{\"name\": \"piRobot\",\"pass\": \"123\"}");
+  }	
+
+  function socketTruckSendOnPlace(){
+		console.log("sendOnPlace");
+		socketTruck.emit('onPlace', "{\"name\": \"piRobot\",\"pass\": \"123\"}");
+  }	
+</script>
+<!DOCTYPE html>
+<html>
+<head>
+	<title></title>
+</head>
+<body>
+		<p>DEVICE</p>
+			<button onclick="socketDeviceSendFirstData()">socketSendFirstData (2)</button>
+			<button onclick="socketDeviceSendData()">socketSendData (3)</button>
+			<button onclick="socketDeviceStartWay()">socketDeviceStartWay (5)</button>
+		<p>TRUCK</p>
+			<button onclick="socketTruckSendFirstData()">socketSendFirstData (1)</button>					
+			<button onclick="socketTruckSendOnPlace()">socketTruckSendOnPlace (4)</button>	
+			<button onclick="socketTruckSendWayEnd()">socketTruckSendWayEnd (6)</button>
+</body>
+</html>>
