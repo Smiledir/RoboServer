@@ -26,6 +26,7 @@ var cookieParser = require('cookie-parser');
 var cookieSession = require('cookie-session');
 var socketFromDevice = require('./socketFromDevice');
 var socketServer = require('./socketServer');
+var socketServer2 = require('./socketServer2');
 //var routeBuilder = require('./routeBuilder');
 var dataController = require('./dataController');
 
