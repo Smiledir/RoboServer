@@ -1,4 +1,6 @@
 
+var dataController = require('./dataController');
+
 var WebSocketServer = require('websocket').server;
 var http = require('http');
 
@@ -33,16 +35,64 @@ wsServer.on('request', function(request) {
     connection.on('message', function(message) {
         if (message.type === 'utf8') {
             console.log('Received Message: ' + message.utf8Data);
-            connection.sendUTF(message.utf8Data);
+
+            try {
+                let json = JSON.parse(message.utf8Data.toString());
+
+                if(json.event === 'firstData'){
+                    firstDataSocket(json, connection);
+                    return;
+                }
+
+                if(json.event === 'onPlace'){
+                    onPlace(json, connection);
+                    return;
+                }
+
+
+            }catch (ex) {
+                console.log("Parse Error: " + message.utf8Data.toString());
+            }
+
+            //connection.sendUTF(message.utf8Data);
         }
         else if (message.type === 'binary') {
             console.log('Received Binary Message of ' + message.binaryData.length + ' bytes');
-            connection.sendBytes(message.binaryData);
+            //connection.sendBytes(message.binaryData);
         }
     });
+
     connection.on('close', function(reasonCode, description) {
         console.log(' Peer ' + connection.remoteAddress + ' disconnected.');
     });
 });
 
-console.log(' last');
+var firstDataSocket = function(buffer, socket){
+
+    let json = buffer;
+
+    //let json = JSON.parse(buffer.toString());
+
+    // Проверяем пароль
+    if(json.pass != "123"){
+        socket.sendUTF("{\"event\": \"firstData\", \"error\": \"Wrong Password\"}\n");
+        console.log("Wrong Password " + socket.localAddress);
+        return;
+    }
+
+    // Имя - наш уникальный идентификатор, поэтому оно не должно повторяться
+    if(json.name === "undefined"){
+        socket.sendUTF("{\"event\": \"firstData\", \"error\": \"Name undefined\"}");
+        console.log("Name Already Used " + json.name);
+        return;
+    }
+
+    dataController.registerTruck(json, socket);
+
+    console.log("register complete");
+};
+
+var onPlace = function(data, client){
+
+    dataController.onPlace(data, client);
+};

@@ -13,6 +13,9 @@ var routeBuilder = require('./routeBuilder');
 var trucksToDevices = new Map();
 var devicesToTrucks = new Map();
 
+// Так тупо проще
+var truckSocketToTruck = new Map();
+
 // Используем сет, чтобы значение не дублировалось
 // а лучше на какой нибудь
 var trucks = new Set();
@@ -38,10 +41,10 @@ var trucks = new Set();
 });*/
 
 // Получаем информацию с утройства и обрабатываем её
-var takeDeviceData = function(coords, device) {
+var takeDeviceData = function(json, device) {
 
     // получаем маршрут по нашим координатам
-    let nodes = routeBuilder.buildRoute(coords);
+    let nodes = routeBuilder.buildRouteTo(json.coords, json.searchText);
 
     // Получаем ближайшую свободную тележку
     let truck = findNearestFreeTruck(nodes[0]);
@@ -63,6 +66,8 @@ var takeDeviceData = function(coords, device) {
     trucksToDevices.set(truck.socket, device);
     devicesToTrucks.set(device, truck);
 
+    truck.way = "place";
+
     sendNodes(nodes, truck, device);
 };
 
@@ -70,7 +75,9 @@ var takeDeviceData = function(coords, device) {
 var sendNodes = function(nodes, truck, device) {
     console.log(JSON.stringify(nodes));
 
-    truck.socket.emit("nodes", JSON.stringify(nodes));
+    nodes.event = "nodes";
+
+    truck.socket.sendUTF(JSON.stringify(nodes));
     device.emit("data", "{\"trackName\": \"" + truck.name + "\"}");
 };
 
@@ -103,19 +110,24 @@ var registerTruck = function(data, truckSocket) {
             let truck = {
                 name: data.name,
                 socket: truckSocket,
-                isBusy: false
+                isBusy: false,
+                way: "start"
+                // start - при регистрации
+                // place - около человека
+                // end - конец пути
             };
 
             console.log("truck add");
 
             // Проверка на добавленность
             for (let item of trucks) if(item.name === data.name) {
-                truckSocket.emit("firstData", " \"{\"error\": \"Name Already Used\"}");
+                truckSocket.sendUTF("{\"event\": \"firstData\", \"error\": \"Name Already Used\"}");
                 db.close();
                 return;
             }
 
-            truckSocket.emit("firstData", " \"{\"status\": \"OK\"}");
+            truckSocketToTruck.set(truckSocket, truck);
+            truckSocket.sendUTF("{\"event\": \"firstData\", \"status\": \"OK\"}");
             trucks.add(truck);
 
             db.close();
@@ -132,9 +144,11 @@ var startWay = function(data, device) {
         return;
     }
 
-    // Тут можно передавать девайс id
-    // Но пока несущественно, так как есть словари
-    truck.socket.emit("starWay", "{\"status\" : \"OK\"}");
+    // получаем маршрут по нашим координатам
+    let nodes = routeBuilder.buildRouteFrom(data.coords);
+    truck.way = "end";
+
+    sendNodes(nodes, truck, device);
 };
 
 var wayEnd = function(data, truck) {
@@ -142,30 +156,49 @@ var wayEnd = function(data, truck) {
 
     if(device === undefined){
         console.log("wrong device");
-        truck.emit('cancel', "{\"error\": \"wayEnd wrong device\"}")
+        truck.sendUTF("{\"event\": \"cancel\", \"error\": \"wayEnd wrong device\"}")
         return;
     }
 
     devicesToTrucks.delete(device);
     trucksToDevices.delete(truck);
 
+    truck.way = "start";
+
     // Тут можно передавать девайс id
     // Но пока несущественно, так как есть словари
     device.emit("wayEnd", "{\"status\" : \"OK\"}");
 };
 
-var onPlace = function(data, truck) {
-    let device = trucksToDevices.get(truck);
+var place = function(data, truckSocket) {
+    let device = trucksToDevices.get(truckSocket);
 
     if(device === undefined){
         console.log("wrong device");
-        truck.emit('cancel', "{\"error\": \"onPlace wrong device\"}")
+        truckSocket.sendUTF("{\"event\": \"cancel\", \"error\": \"onPlace wrong device\"}")
         return;
     }
 
     // Тут можно передавать девайс id
     // Но пока несущественно, так как есть словари
     device.emit("onPlace", "{\"status\" : \"OK\"}");
+};
+
+
+var onPlace = function(data, truckSocket) {
+
+    var truck = truckSocketToTruck.get(truckSocket);
+
+    if(truck.way === "place"){
+        place(data, truckSocket);
+        return;
+    }
+
+    if(truck.way === "end"){
+        wayEnd(data, truckSocket);
+        return;
+    }
+
 };
 
 var cancelDevice = function(data, device) {
@@ -182,7 +215,7 @@ var cancelDevice = function(data, device) {
 
     // Тут можно передавать девайс id
     // Но пока несущественно, так как есть словари
-    truck.socket.emit("cancel", "{\"status\" : \"OK\"}");
+    truck.socket.sendUTF("\"event\": \"cancel\", {\"status\" : \"OK\"}");
 };
 
 

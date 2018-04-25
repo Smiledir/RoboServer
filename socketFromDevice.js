@@ -80,7 +80,7 @@ var dataSocket = function(buffer, socket) {
         console.log("Position Error " + socket.localAddress);
     }
 
-    dataController.takeDeviceData(json.coords, socket);
+    dataController.takeDeviceData(json, socket);
 };
 
 var startWay = function(data, device) {

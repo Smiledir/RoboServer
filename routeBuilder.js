@@ -24,8 +24,22 @@ var refreshNodes = function() {
     });
 };
 
+// Вызываем при движении к человеку
+var buildRouteTo = function(coords, text) {
 
-var buildRoute = function(coords) {
+    if(coords == undefined || coords.x == undefined || coords.y == undefined ){
+        console.log("Wrong Coords")
+        //return "Error";
+    }
+
+    // Тут по координатам ищем путь
+    // НЕ ЗАБУДЬ вершины уже закешированны
+    // Возвращаем вершины
+    return nodes;
+};
+
+// Вызываем при движении к месту
+var buildRouteFrom = function(coords, text) {
 
     if(coords == undefined || coords.x == undefined || coords.y == undefined ){
         console.log("Wrong Coords")
@@ -39,7 +53,8 @@ var buildRoute = function(coords) {
 };
 
 module.exports = {
-    buildRoute: buildRoute
+    buildRouteTo: buildRouteTo,
+    buildRouteFrom: buildRouteFrom
 };
 
 // Чтобы не было ничего лишнего
