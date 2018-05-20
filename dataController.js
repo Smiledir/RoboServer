@@ -69,6 +69,8 @@ var takeDeviceData = function(json, device) {
     truck.way = "place";
 
     sendNodes(nodes, truck, device);
+
+    device.emit("data", "{\"trackName\": \"" + truck.name + "\"}");
 };
 
 // Функция отправки нодов тележке
@@ -78,7 +80,6 @@ var sendNodes = function(nodes, truck, device) {
     nodes.event = "nodes";
 
     truck.socket.sendUTF(JSON.stringify(nodes));
-    device.emit("data", "{\"trackName\": \"" + truck.name + "\"}");
 };
 
 var findNearestFreeTruck = function(node) {
@@ -111,7 +112,8 @@ var registerTruck = function(data, truckSocket) {
                 name: data.name,
                 socket: truckSocket,
                 isBusy: false,
-                way: "start"
+                way: "start",
+                pos: data.pos
                 // start - при регистрации
                 // place - около человека
                 // end - конец пути
