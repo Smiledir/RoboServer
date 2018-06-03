@@ -43,11 +43,13 @@ var trucks = new Set();
 // Получаем информацию с утройства и обрабатываем её
 var takeDeviceData = function(json, device) {
 
-    // получаем маршрут по нашим координатам
-    let nodes = routeBuilder.buildRouteTo(json.coords, json.searchText);
-
     // Получаем ближайшую свободную тележку
-    let truck = findNearestFreeTruck(nodes[0]);
+    let truck = findNearestFreeTruck();
+
+    // получаем маршрут по нашим координатам
+    let nodes = routeBuilder.buildRouteTo();
+
+    //console.log(json.placeText + " | " + json.searchText);
 
    // console.log(truck.name);
 
@@ -56,7 +58,7 @@ var takeDeviceData = function(json, device) {
 
     if(truck === undefined || truck.isBusy){
         console.log("cancel, no trucks");
-        device.emit("cancel", "{\"error\": \"Нет свободных тележек, попробуйте позже\"}");
+        device.emit("cancel", "{\"error\": \"Нет свободных мобильных устройств, попробуйте позже\"}");
         return;
     }
 
@@ -113,7 +115,8 @@ var registerTruck = function(data, truckSocket) {
                 socket: truckSocket,
                 isBusy: false,
                 way: "start",
-                pos: data.pos
+                pos: undefined
+                // way:
                 // start - при регистрации
                 // place - около человека
                 // end - конец пути
@@ -203,6 +206,15 @@ var onPlace = function(data, truckSocket) {
 
 };
 
+var point = function(data, truckSocket) {
+
+    var truck = truckSocketToTruck.get(truckSocket);
+
+    truck.pos = data.pos;
+    // задать точку тележке
+
+};
+
 var cancelDevice = function(data, device) {
     let truck = devicesToTrucks.get(device);
 
@@ -227,5 +239,6 @@ module.exports = {
     startWay: startWay,
     wayEnd: wayEnd,
     onPlace: onPlace,
-    cancelDevice: cancelDevice
+    cancelDevice: cancelDevice,
+    point: point
 };

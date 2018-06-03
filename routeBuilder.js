@@ -65,12 +65,7 @@ var makeFullNodes = function(nodes){
 };
 
 // Вызываем при движении к человеку
-var buildRouteTo = function(coords, text) {
-
-    if(coords == undefined || coords.x == undefined || coords.y == undefined ){
-        console.log("Wrong Coords")
-        //return "Error";
-    }
+var buildRouteTo = function(start, end) {
 
     // Гранд костыль
     // Копируем ноды, чтобы в случае параллельности не пересеклись
@@ -93,11 +88,27 @@ var buildRouteTo = function(coords, text) {
     }
 
 
+    let startNode;
+    let endNode;
+
+    for(let n of allNodes) {
+
+        if(n.node._id == start){
+            startNode = n;
+        }
+
+        if(n.node._id == end){
+            endNode = n;
+        }
+    }
+
+    if(startNode == undefined || endNode == undefined){
+        console.log("Wrong points");
+        startNode = allNodes[0];
+        endNode = allNodes[3];
+    }
+
     // Обход в ширину
-
-    let startNode = allNodes[0];
-    let endNode = allNodes[3];
-
     let queue = [];
 
     queue.push(startNode);
@@ -168,17 +179,9 @@ var buildRouteTo = function(coords, text) {
 
 
 // Вызываем при движении к месту
-var buildRouteFrom = function(coords, text) {
+var buildRouteFrom = function(coords) {
 
-    if(coords == undefined || coords.x == undefined || coords.y == undefined ){
-        console.log("Wrong Coords")
-        //return "Error";
-    }
-
-    // Тут по координатам ищем путь
-    // НЕ ЗАБУДЬ вершины уже закешированны
-    // Возвращаем вершины
-    return nodes;
+    return buildRouteTo();
 };
 
 module.exports = {

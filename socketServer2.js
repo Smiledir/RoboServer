@@ -49,6 +49,11 @@ wsServer.on('request', function(request) {
                     return;
                 }
 
+                if(json.event === 'point'){
+                    point(json, connection);
+                    return;
+                }
+
 
             }catch (ex) {
                 console.log("Parse Error: " + message.utf8Data.toString());
@@ -95,4 +100,9 @@ var firstDataSocket = function(buffer, socket){
 var onPlace = function(data, client){
 
     dataController.onPlace(data, client);
+};
+
+var point = function(data, client){
+
+    dataController.point(data, client);
 };
