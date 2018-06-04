@@ -184,9 +184,20 @@ var buildRouteFrom = function(coords) {
     return buildRouteTo();
 };
 
+var getNodeByRoom  = function(room) {
+
+    for (n of fullNodes){
+
+        if(n.room_id == room._id){
+            return n;
+        }
+    }
+};
+
 module.exports = {
     buildRouteTo: buildRouteTo,
-    buildRouteFrom: buildRouteFrom
+    buildRouteFrom: buildRouteFrom,
+    getNodeByRoom: getNodeByRoom
 };
 
 // Чтобы не было ничего лишнего
